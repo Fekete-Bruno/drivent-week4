@@ -28,11 +28,24 @@ async function createBooking(bookingParams: CreateBookingParams) {
   });
 }
 
+async function updateBooking(updatedBooking: UpdateBookingParams, bookingId: number) {
+  return prisma.booking.update({
+    data: {
+      ...updatedBooking
+    },
+    where: {
+      id: bookingId
+    }
+  });
+}
+
 export type CreateBookingParams = Omit<Booking, "id" | "createdAt" | "updatedAt">
+export type UpdateBookingParams = CreateBookingParams;
 const bookingRepository = {
   findBooking,
   countBookings,
   createBooking,
+  updateBooking,
 };
 
 export default bookingRepository;

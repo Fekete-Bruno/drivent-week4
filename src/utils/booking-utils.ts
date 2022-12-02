@@ -1,4 +1,6 @@
+import bookingRepository from "@/repositories/booking-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
+import hotelRepository from "@/repositories/hotel-repository";
 import ticketRepository from "@/repositories/ticket-repository";
 
 async function checkEnrollmentAndTicket(userId: number) {
@@ -19,8 +21,22 @@ async function checkEnrollmentAndTicket(userId: number) {
   return true;
 }
 
+async function checkRoom(roomId: number) {
+  const room = await hotelRepository.findRoomById(roomId);
+  if(!room) return 0;
+  return room.capacity;
+}
+
+async function checkBookingCount(roomId: number, capacity: number) {
+  const bookingCount = await bookingRepository.countBookings(roomId);
+  if(bookingCount===capacity) return false;
+  return true;
+}
+
 const bookingUtils = {
   checkEnrollmentAndTicket,
+  checkRoom,
+  checkBookingCount,
 };
 
 export default bookingUtils;
