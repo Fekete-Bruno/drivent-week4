@@ -3,9 +3,6 @@ import bookingRepository from "@/repositories/booking-repository";
 import bookingUtils from "@/utils/booking-utils";
 
 async function getBooking(userId: number) {
-  const hasEnrollmentAndTicket = await bookingUtils.checkEnrollmentAndTicket(userId);
-  if(!hasEnrollmentAndTicket) throw forbiddenError();
-  
   const booking = await bookingRepository.findBooking(userId);
 
   if(!booking) throw notFoundError();
