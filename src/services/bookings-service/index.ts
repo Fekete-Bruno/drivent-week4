@@ -1,6 +1,5 @@
 import { forbiddenError, notFoundError } from "@/errors";
 import bookingRepository from "@/repositories/booking-repository";
-import hotelRepository from "@/repositories/hotel-repository";
 import bookingUtils from "@/utils/booking-utils";
 
 async function getBooking(userId: number) {
