@@ -3,6 +3,9 @@ import bookingRepository from "@/repositories/booking-repository";
 import bookingUtils from "@/utils/booking-utils";
 
 async function getBooking(userId: number) {
+  const hasEnrollmentAndTicket = await bookingUtils.checkEnrollmentAndTicket(userId);
+  if(!hasEnrollmentAndTicket) throw forbiddenError();
+  
   const booking = await bookingRepository.findBooking(userId);
 
   if(!booking) throw notFoundError();
@@ -21,13 +24,15 @@ async function postBooking(userId: number, roomId: number) {
     throw forbiddenError();
   }
 
-  if(!bookingUtils.checkEnrollmentAndTicket(userId)) throw forbiddenError();
+  const hasEnrollmentAndTicket = await bookingUtils.checkEnrollmentAndTicket(userId);
+  if(!hasEnrollmentAndTicket) throw forbiddenError();
 
-  const roomCapacity = await bookingUtils.checkRoom(roomId);
-  if(!roomCapacity) throw notFoundError();
+  const doesRoomExist = await bookingUtils.checkRoom(roomId);
+  if(!doesRoomExist) throw notFoundError();
 
-  if(!bookingUtils.checkBookingCount(roomId, roomCapacity)) throw forbiddenError();
-
+  const roomHasCapacity = await bookingUtils.checkBookingCount(roomId, doesRoomExist.capacity);
+  if(!roomHasCapacity) throw forbiddenError();
+  
   const bookingExists = await bookingRepository.findBooking(userId);
   if(bookingExists) throw forbiddenError();
 
@@ -52,16 +57,18 @@ async function editBooking(userId: number, roomId: number, bookingId: number) {
     throw forbiddenError();
   }
 
-  if(!bookingUtils.checkEnrollmentAndTicket(userId)) throw forbiddenError();
+  const hasEnrollmentAndTicket = await bookingUtils.checkEnrollmentAndTicket(userId);
+  if(!hasEnrollmentAndTicket) throw forbiddenError();
 
   const booking = await bookingRepository.findBooking(userId);
   if(!booking) throw forbiddenError();
   if(booking.id!==bookingId) throw forbiddenError();
 
-  const roomCapacity = await bookingUtils.checkRoom(roomId);
-  if(!roomCapacity) throw notFoundError();
+  const doesRoomExist = await bookingUtils.checkRoom(roomId);
+  if(!doesRoomExist) throw notFoundError();
 
-  if(!bookingUtils.checkBookingCount(roomId, roomCapacity)) throw forbiddenError();
+  const roomHasCapacity = await bookingUtils.checkBookingCount(roomId, doesRoomExist.capacity);
+  if(!roomHasCapacity) throw forbiddenError();
   
   const newBooking = await bookingRepository.updateBooking({ userId, roomId }, bookingId);
   return {
