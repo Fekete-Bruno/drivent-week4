@@ -24,7 +24,7 @@ async function checkEnrollmentAndTicket(userId: number) {
 async function checkRoom(roomId: number) {
   const room = await hotelRepository.findRoomById(roomId);
   if(!room) return 0;
-  return room.capacity;
+  return room;
 }
 
 async function checkBookingCount(roomId: number, capacity: number) {
